@@ -555,6 +555,7 @@ const intervalo = setInterval(function() {
     const box = document.querySelector('.cheat-menu').getBoundingClientRect();
     if (box.top < 16) {
         clearInterval(intervalo);
+        document.querySelector('.cheat-menu').style.transform = `translateY(${io}px`;
     }
 }, 100);
 
@@ -565,5 +566,6 @@ const intervala = setInterval(function() {
     const box = document.querySelector('.cheat-menu').getBoundingClientRect();
     if (box.left < 16) {
         clearInterval(intervala);
+        document.querySelector('.cheat-menu').style.transform = `translateX(${ia}px`;
     }
 }, 100);
