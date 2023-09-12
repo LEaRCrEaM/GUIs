@@ -27,8 +27,11 @@ document.body.insertAdjacentHTML('beforeend', `
 }
 
 .kainvas {
-    position: absolute;
-}
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
 
 .cheat-menu * {
     z-index: 1;
@@ -157,10 +160,23 @@ input:checked + .slider:before {
       }
     }
 
+    @keyframes gradientAnimation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
   </style>
 </head>
 <body>
   <div class="cheat-menu" style="display: block">
+    <canvas class="kainvas"></canvas>
     <canvas class="kainvas"></canvas>
     <div class="tabs">
       <button class="tab-button active" onclick="openTab('tab1')">Main</button>
@@ -227,28 +243,40 @@ input:checked + .slider:before {
     <div id="tab3" class="tab-content" style="display:none;">
         <h2>Misc</h2>
         <div class="cheat-category">
-          <h3>Design</h3>
+          <h3>GUI Design</h3>
           <div class="cheat">
-            <label>Show GUI Particles</label>
+            <label>GUI Particles</label>
             <label class="switch">
-              <input type="checkbox" checked onchange="toggleCheat('cheat7')" data-tooltip="Enable Cheat 7">
+              <input type="checkbox" onchange="toggleCheat('cheat7')" data-tooltip="Enable Cheat 7">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="cheat">
+            <label>GUI Particles 2</label>
+            <label class="switch">
+              <input type="checkbox" onchange="toggleCheat('cheat9')" data-tooltip="Enable Cheat 9">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <h3>Background</h3>
+          <div class="cheat">
+            <label>Color Flow</label>
+            <label class="switch">
+              <input type="checkbox" onchange="toggleCheat('cheat8')" data-tooltip="Enable Cheat 8">
               <span class="slider"></span>
             </label>
           </div>
         </div>
       </div>
   </div>
-  <script src="script.js"></script>
-  <script>
-  </script>
-</body>
-</html>
+  </body>
+  </html>
 
 
 
 
 `);
-let boundingBox;
+let boundingBox, particles = [];
 
     document.addEventListener('keypress', function(e) {
       if (e.keyCode === 96) {
@@ -308,36 +336,10 @@ function resetCheats() {
 
 // Previous JavaScript code remains the same. Add the following functions:
 
+let showKainvas1 = true, showKainvas2 = true;
 
-function openTab(tabName) {
-  const targetTab = document.getElementById(tabName);
-  const isCurrentlyOpen = targetTab.style.display === 'block';
-
-  // Check if the target tab is already open, if so, close it
-  if (isCurrentlyOpen) {
-    targetTab.style.display = 'none';
-    event.currentTarget.classList.remove('active');
-    document.querySelector('.kainvas').style.display = 'none';
-    return; // Exit the function early to avoid opening the tab again
-  }
-
-  // If the tab is not open, follow the rest of the existing logic
-  const tabContents = document.getElementsByClassName('tab-content');
-  for (const content of tabContents) {
-    content.style.display = 'none';
-  }
-
-  const tabButtons = document.getElementsByClassName('tab-button');
-  for (const button of tabButtons) {
-    button.classList.remove('active');
-  }
-
-  document.querySelector('.kainvas').style.display = 'block';
-  targetTab.style.display = 'block';
-  event.currentTarget.classList.add('active');
-  if (bool) {
-     a();
-     bool = false;
+function kainvas1() {
+  if (document.querySelector('input[data-tooltip="Enable Cheat 7"]').checked) {
      boundingBox = document.querySelector('.cheat-menu').getBoundingClientRect();
      document.querySelector('.kainvas').width = boundingBox.width;
      document.querySelector('.kainvas').height = boundingBox.height;console.log(boundingBox);
@@ -347,7 +349,7 @@ function openTab(tabName) {
         x: undefined,
         y: undefined
     }
-
+// THIS IS CURRENT CODE
     document.addEventListener('mousemove', function(e) {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
@@ -421,9 +423,9 @@ function openTab(tabName) {
             }
         }
 
-        let particles = [];
+        //let particles = [];
 
-        for (let i=0;i<100;i++) {
+        for (let i=0;i<200;i++) {
             let x = Math.random() * canvas.width;
             let y = Math.random() * canvas.height;
             const particle = new Particle(x, y);
@@ -455,14 +457,129 @@ function openTab(tabName) {
         }
 
         animate();
+      } else if (!showKainvas1) {
+        return
+      }
+}
+
+const canvas = document.querySelectorAll('.kainvas')[1];
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = document.querySelector('.cheat-menu').innerWidth;
+      canvas.height = document.querySelector('.cheat-menu').innerHeight;
+
+      const particles2 = [];
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff'];
+
+      class Particle {
+          constructor(x, y) {
+              this.x = x;
+              this.y = y;
+              this.size = Math.random() * 15 + 1;
+              this.speedX = Math.random() * 3 - 1.5;
+              this.speedY = Math.random() * 3 - 1.5;
+              this.color = colors[Math.floor(Math.random() * colors.length)];
+          }
+          update() {
+              this.x += this.speedX;
+              this.y += this.speedY;
+              if (this.size > 0.2) this.size -= 0.1;
+          }
+          draw() {
+              ctx.fillStyle = this.color;
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+              ctx.fill();
+          }
+      }
+
+      function handleParticles() {
+          for (let i = 0; i < particles2.length; i++) {
+              particles2[i].update();
+              particles2[i].draw();
+              if (particles2[i].size <= 0.3) {
+                  particles2.splice(i, 1);
+                  i--;
+              }
+          }
+      }
+
+      function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          handleParticles();
+          requestAnimationFrame(animate);
+      }
+
+      addEventListener('mousemove', (event) => {
+          const { clientX, clientY } = event;
+          for (let i = 0; i < 5; i++) {
+              particles2.push(new Particle(clientX, clientY));
+          }
+      });
+
+      animate();
+
+      if (!document.querySelector('input[data-tooltip="Enable Cheat 9"]').checked) {
+        document.querySelectorAll('.kainvas')[1].style.display = 'none';
+      }
+
+
+function openTab(tabName) {
+  const targetTab = document.getElementById(tabName);
+  const isCurrentlyOpen = targetTab.style.display === 'block';
+
+  // Check if the target tab is already open, if so, close it
+  if (isCurrentlyOpen) {
+    targetTab.style.display = 'none';
+    event.currentTarget.classList.remove('active');
+    document.querySelector('.kainvas').style.display = 'none';
+    return; // Exit the function early to avoid opening the tab again
+  }
+
+  // If the tab is not open, follow the rest of the existing logic
+  const tabContents = document.getElementsByClassName('tab-content');
+  for (const content of tabContents) {
+    content.style.display = 'none';
+  }
+
+  const tabButtons = document.getElementsByClassName('tab-button');
+  for (const button of tabButtons) {
+    button.classList.remove('active');
+  }
+
+  document.querySelector('.kainvas').style.display = 'block';
+  targetTab.style.display = 'block';
+  event.currentTarget.classList.add('active');
+  if (bool) {
+     a();
+     bool = false;
+     if (document.querySelector('input[data-tooltip="Enable Cheat 7"]').checked) {
+        kainvas1();
+     }
+     //kainvas2();
    } else {
+    if (document.querySelector('input[data-tooltip="Enable Cheat 7"]').checked) {
     boundingBox = document.querySelector('.cheat-menu').getBoundingClientRect();
      document.querySelector('.kainvas').width = boundingBox.width;
      document.querySelector('.kainvas').height = boundingBox.height;console.log(boundingBox);
      document.querySelector('.kainvas').style.left = boundingBox.left;
      document.querySelector('.kainvas').style.top = boundingBox.top;
      //return
+    } else {
+      document.querySelector('.kainvas').style.display = 'none';
+    }
    }
+
+   if (document.querySelector('input[data-tooltip="Enable Cheat 9"]').checked) {
+    boundingBox = document.querySelector('.cheat-menu').getBoundingClientRect();
+    document.querySelectorAll('.kainvas')[1].width = boundingBox.width;
+    document.querySelectorAll('.kainvas')[1].height = boundingBox.height;console.log(boundingBox);
+    document.querySelectorAll('.kainvas')[1].style.left = boundingBox.left;
+    document.querySelectorAll('.kainvas')[1].style.top = boundingBox.top;
+    //return
+    } else {
+      document.querySelectorAll('.kainvas')[1].style.display = 'none';
+    }
    
     /*particle('🤣', 100, 50);
     particle('👌', 50, 80);
@@ -486,15 +603,56 @@ function openTab(tabName) {
     particle('🍦', 630, 680);*/
 }
 
+
 function toggleCheat(cheatName) {
   const cheatState = event.currentTarget.checked;
   // Implement your cheat logic here
   console.log(`${cheatName} is ${cheatState ? 'activated' : 'deactivated'}`);
   if (cheatName === 'cheat7') {
     if (!cheatState) {
+      showKainvas1 = false;
       document.querySelector('.kainvas').style.display = 'none';
     } else {
+        showKainvas1 = true;
         document.querySelector('.kainvas').style.display = 'block';
+    }
+  }
+  if (cheatName === 'cheat8') {
+    if (cheatState) {
+      document.querySelector('.cheat-menu').style.background = 'linear-gradient(-45deg, #FFD700, #FF6347, #00BFFF, #32CD32)';
+      document.querySelector('.cheat-menu').style.backgroundSize = '400% 400%';
+      document.querySelector('.cheat-menu').style.animation = 'gradientAnimation 15s infinite';
+      document.querySelectorAll('.tab-button').forEach(e => {
+        e.style.background = 'transparent';
+      });
+      document.querySelectorAll('.slider').forEach(e => {
+        e.style.background = 'transparent';
+        e.style.boxShadow = '0 0 0 2px #007bff';
+      });
+    } else {
+      document.querySelector('.cheat-menu').style.backgroundColor = '#2d2d2d;';
+      document.querySelector('.cheat-menu').style.backgroundSize = '100% 100%';
+      document.querySelector('.cheat-menu').style.animation = '';
+      document.querySelector('.cheat-menu').style.backgroundImage = '';
+      document.querySelectorAll('.tab-button').forEach(e => {
+        e.style.background = '#2d2d2d';
+      });
+      document.querySelectorAll('.slider').forEach(e => {
+        e.style.background = '#333';
+        e.style.boxShadow = '';
+      });
+    }
+  }
+  if (cheatName === 'cheat9') {
+    if (cheatState) {
+      document.querySelectorAll('.kainvas')[1].style.display = 'block';
+      boundingBox = document.querySelector('.cheat-menu').getBoundingClientRect();
+      document.querySelectorAll('.kainvas')[1].width = boundingBox.width;
+      document.querySelectorAll('.kainvas')[1].height = boundingBox.height;console.log(boundingBox);
+      document.querySelectorAll('.kainvas')[1].style.left = boundingBox.left;
+      document.querySelectorAll('.kainvas')[1].style.top = boundingBox.top;
+    } else {
+      document.querySelectorAll('.kainvas')[1].style.display = 'none';
     }
   }
 }
@@ -548,24 +706,41 @@ let particleNum = 0;
       pa.textContent = particle;
     }
 
-let io = 0;
-const intervalo = setInterval(function() {
-    io-=10;
-    document.querySelector('.cheat-menu').style.transform = `translateY(${io}px)`;
-    const box = document.querySelector('.cheat-menu').getBoundingClientRect();
-    if (box.top < 16) {
-        clearInterval(intervalo);
-        document.querySelector('.cheat-menu').style.transform = `translateY(${io}px`;
-    }
-}, 100);
+    let intervalo;
+    let intervala;
 
-let ia = 0;
-const intervala = setInterval(function() {
-    ia-=10;
-    document.querySelector('.cheat-menu').style.transform = `translateX(${ia}px)`;
-    const box = document.querySelector('.cheat-menu').getBoundingClientRect();
-    if (box.left < 16) {
-        clearInterval(intervala);
-        document.querySelector('.cheat-menu').style.transform = `translateX(${ia}px`;
+    function moveMenuVertically() {
+      let io = 0;
+      intervalo = setInterval(function() {
+        io -= 10;
+        document.querySelector('.cheat-menu').style.transform = `translateY(${io}px)`;
+        const box = document.querySelector('.cheat-menu').getBoundingClientRect();
+        if (box.top < 16) {
+          clearInterval(intervalo);
+        }
+      }, 100);
     }
-}, 100);
+
+    function moveMenuHorizontally() {
+      let ia = 0;
+      intervala = setInterval(function() {
+        ia -= 10;
+        document.querySelector('.cheat-menu').style.transform = `translateX(${ia}px)`;
+        const box = document.querySelector('.cheat-menu').getBoundingClientRect();
+        if (box.left < 16) {
+          clearInterval(intervala);
+        }
+      }, 100);
+    }
+
+    function GUIPositioning() {
+      clearInterval(intervalo);
+      clearInterval(intervala);
+      moveMenuVertically();
+      moveMenuHorizontally();
+    }
+
+    GUIPositioning();
+
+    window.addEventListener('resize', GUIPositioning);
+    window.addEventListener('scroll', GUIPositioning);
